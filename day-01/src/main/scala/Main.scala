@@ -86,15 +86,6 @@ val calibrateValuesWStrings = (line: String) => {
         found = true
       }
     }
-    // if (wordsToNums.contains(currentWord) && !found) {
-    //   val num = wordsToNums(currentWord)
-    //   println("First Digit: " + num)
-    //   firstDigit = num
-    //   currentWord = ""
-    //   found = true
-    // }
-    // println(char)
-    // print(i)
     if (char.isDigit && !found) {
       val num = char.asDigit
       println("First Word Digit: " + num)
