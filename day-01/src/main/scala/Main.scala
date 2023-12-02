@@ -31,6 +31,29 @@ val reversedWordsToNums = wordsToNums.map { case (key, value) => (key.reverse, v
   println(p1values.sum)
   println(p2Values.sum)
 
+val calibrateValues = (line: String) => {
+  val reversedLine: String = line.reverse
+
+  // find the first digit going through
+  val firstDigit = findDigit(line, false)
+
+  // find the second digit, by going in reverse
+  val secondDigit = findDigit(reversedLine, false)
+
+  val output: List[Int] = List(firstDigit,secondDigit)
+  output
+}
+val calibrateValuesWStrings = (line: String) => {
+ // 54431
+  val reversedLine: String = line.reverse
+  // find the first digit going through
+  val firstDigit = findDigit(line, true)
+  // find the second digit, by going in reverse
+  val secondDigit = findDigit(reversedLine, true)
+
+  val output: List[Int] = List(firstDigit, secondDigit)
+  output
+}
 
 val findDigit = (line: String, acceptWords: Boolean) => {
   var digit = -1
@@ -63,28 +86,4 @@ val findDigit = (line: String, acceptWords: Boolean) => {
     }
   }
   digit
-}
-
-val calibrateValues = (line: String) => {
-  val reversedLine: String = line.reverse
-
-  // find the first digit going through
-  val firstDigit = findDigit(line, false)
-
-  // find the second digit, by going in reverse
-  val secondDigit = findDigit(reversedLine, false)
-
-  val output: List[Int] = List(firstDigit,secondDigit)
-  output
-}
-val calibrateValuesWStrings = (line: String) => {
- // 54431
-  val reversedLine: String = line.reverse
-  // find the first digit going through
-  val firstDigit = findDigit(line, true)
-  // find the second digit, by going in reverse
-  val secondDigit = findDigit(reversedLine, true)
-
-  val output: List[Int] = List(firstDigit, secondDigit)
-  output
 }
