@@ -1,3 +1,20 @@
+package day1
+
+import scala.util.control.Breaks._
+
+val wordsToNums = Map(
+    "one" -> 1,
+    "two" -> 2,
+    "three" -> 3,
+    "four" -> 4,
+    "five" -> 5,
+    "six" -> 6,
+    "seven" -> 7,
+    "eight" -> 8,
+    "nine" -> 9
+)
+val reversedWordsToNums = wordsToNums.map { case (key, value) => (key.reverse, value) }
+
 @main def hello: Unit =
   val path: os.Path = os.root / "Users" / "agadd1" / "Documents" / "Adam" / "GitHub" / "AOC-2023" / "inputs" / "day1" / "p1.txt"
   val lines: Seq[String] = os.read.lines(path)
@@ -15,111 +32,59 @@
   println(p2Values.sum)
 
 
-val calibrateValues = (line: String) => {
-  var output: List[Int] = List()
-  var firstDigit: Int = 0
-  var secondDigit: Int = 0
-  var found = false
-
-  // find the first digit going through
-  for (i <- 0 to line.length - 1) {
-    val char = line.charAt(i)
-    // println(char)
-    // print(i)
-    var output: List[Int] = List()
-    if (char.isDigit && !found) {
-      val num = char.asDigit
-      println("First Digit: " + num)
-      firstDigit = num
-      found = true
-    }
-  }
-  // find the second digit, by going in reverse
-  found = false
-  val reversedLine: String = line.reverse
-  for (i <- 0 to reversedLine.length - 1) {
-    val char = reversedLine.charAt(i)
-    // println(char)
-    if (char.isDigit && !found) {
-      val num = char.asDigit
-      println("Second Digit: " + num)
-      secondDigit = num
-      found = true
-    }
-  }
-  output = firstDigit :: secondDigit :: output
-  output
-}
-
-
-val calibrateValuesWStrings = (line: String) => {
-  val wordsToNums = Map(
-    "one" -> 1,
-    "two" -> 2,
-    "three" -> 3,
-    "four" -> 4,
-    "five" -> 5,
-    "six" -> 6,
-    "seven" -> 7,
-    "eight" -> 8,
-    "nine" -> 9
-  )
-  val reversedWordsToNums = wordsToNums.map { case (key, value) => (key.reverse, value) }
-  
-  var output: List[Int] = List()
-  var firstDigit: Int = 0
-  var secondDigit: Int = 0
+val findDigit = (line: String, acceptWords: Boolean) => {
+  var digit = -1
   var found = false
   var currentWord: String = ""
-  
+
+  breakable {
+      for (i <- 0 to line.length - 1) {
+        val char = line.charAt(i)
+        currentWord = currentWord + char
+
+        if (acceptWords && !found) {
+            for (word <- wordsToNums.keys) {
+              if ((currentWord.contains(word) || currentWord.contains(word.reverse))  && !found) {
+                val num = wordsToNums(word)
+                digit = num
+                currentWord = ""
+                found = true
+                break()
+              }
+          }
+        }
+        if (char.isDigit && !found) {
+          val num = char.asDigit
+          println("Found Digit" + num)
+          digit = num
+          found = true
+          break()
+        }
+    }
+  }
+  digit
+}
+
+val calibrateValues = (line: String) => {
+  val reversedLine: String = line.reverse
 
   // find the first digit going through
-  for (i <- 0 to line.length - 1) {
-    val char = line.charAt(i)
-    currentWord = currentWord + char
-    for (word <- wordsToNums.keys) {
-      if (currentWord.contains(word) && !found) {
-        val num = wordsToNums(word)
-        println("First Digit: " + num)
-        firstDigit = num
-        currentWord = ""
-        found = true
-      }
-    }
-    if (char.isDigit && !found) {
-      val num = char.asDigit
-      println("First Word Digit: " + num)
-      firstDigit = num
-      found = true
-    }
-  }
+  val firstDigit = findDigit(line, false)
 
   // find the second digit, by going in reverse
-  found = false
-  currentWord = ""
+  val secondDigit = findDigit(reversedLine, false)
+
+  val output: List[Int] = List(firstDigit,secondDigit)
+  output
+}
+val calibrateValuesWStrings = (line: String) => {
+ // 54431
   val reversedLine: String = line.reverse
-  
-  for (i <- 0 to reversedLine.length - 1) {
-    val char = reversedLine.charAt(i)
-    currentWord = currentWord + char
-    // checks for a word
-    for (word <- reversedWordsToNums.keys) {
-      if (currentWord.contains(word) && !found) {
-        val num = reversedWordsToNums(word)
-        println("Second Word Digit: " + num)
-        secondDigit = num
-        currentWord = ""
-        found = true
-      }
-    }
-    // checks for a normal digit
-    if (char.isDigit && !found) {
-      val num = char.asDigit
-      println("Second Digit: " + num)
-      secondDigit = num
-      found = true
-    }
-  }
-  output = firstDigit :: secondDigit :: output
+  // find the first digit going through
+  val firstDigit = findDigit(line, true)
+  // find the second digit, by going in reverse
+  val secondDigit = findDigit(reversedLine, true)
+
+  val output: List[Int] = List(firstDigit, secondDigit)
   output
 }
