@@ -1,3 +1,4 @@
+
 package day3
 
 
@@ -13,7 +14,7 @@ trait Element:
 case class Symbol(x: Int, length: Int, charValue: Char) extends Element
 case class Number(x: Int, length: Int, intValue: Int) extends Element
 
-@main def hello: Unit =
+@main def main: Unit =
   val path: os.Path = os.root / "Users" / "agadd1" / "Documents" / "Adam" / "GitHub" / "AOC-2023" / "inputs" / "day3" / "p1.txt"
   val lines: String = os.read(path)
   println(s"the answer is ${part1(lines)}")

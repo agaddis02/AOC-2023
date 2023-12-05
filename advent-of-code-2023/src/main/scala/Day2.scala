@@ -14,7 +14,7 @@ val PreloadedBag = Bag(
     )
 )
 
-@main def hello: Unit =
+@main def main: Unit =
     val path: os.Path = os.root / "Users" / "agadd1" / "Documents" / "Adam" / "GitHub" / "AOC-2023" / "inputs" / "day2" / "p1.txt"
     val lines: Seq[String] = os.read.lines(path)
     var p1 = 0

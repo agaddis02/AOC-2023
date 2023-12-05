@@ -15,7 +15,7 @@ val wordsToNums = Map(
 )
 val reversedWordsToNums = wordsToNums.map { case (key, value) => (key.reverse, value) }
 
-@main def hello: Unit =
+@main def main: Unit =
   val path: os.Path = os.root / "Users" / "agadd1" / "Documents" / "Adam" / "GitHub" / "AOC-2023" / "inputs" / "day1" / "p1.txt"
   val lines: Seq[String] = os.read.lines(path)
   var p1values: List[Int] = List()

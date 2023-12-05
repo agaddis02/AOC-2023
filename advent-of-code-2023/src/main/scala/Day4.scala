@@ -2,8 +2,8 @@ package day4
 
 case class Card(Number: Int, WinningNumbers: List[Int], MyNumbers: List[Int])
 
-@main def hello: Unit =
-  val path: os.Path = os.root / "Users" / "agadd1" / "Documents" / "Adam" / "GitHub" / "AOC-2023" / "day-04" / "input.txt"
+@main def main: Unit =
+  val path: os.Path = os.root / "Users" / "agadd1" / "Documents" / "Adam" / "GitHub" / "AOC-2023" / "inputs" / "day4" / "p1.txt"
   val lines: Seq[String] = os.read.lines(path)
   var total = 0
   for (line <- lines)
