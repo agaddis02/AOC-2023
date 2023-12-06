@@ -5,7 +5,7 @@ lazy val root = project
   .settings(
     name := "advent-of-code-2023",
     version := "0.1.0-SNAPSHOT",
-
+    fork in run := true,
     scalaVersion := scala3Version,
 
     libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test,
