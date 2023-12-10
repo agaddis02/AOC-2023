@@ -2,53 +2,77 @@ package day10
 
 import scala.util.control.Breaks._
 import scala.collection.mutable
+import scala.util.matching.Regex
 
+case class Tile(symbol: Char, pos: Point):
+    val neighbours: Set[Point] =
+    symbol match
+        case '|' => Set(pos + North, pos + South)
+        case '-' => Set(pos + East, pos + West)
+        case 'L' => Set(pos + North, pos + East)
+        case 'J' => Set(pos + North, pos + West)
+        case '7' => Set(pos + South, pos + West)
+        case 'F' => Set(pos + South, pos + East)
+        case _   => Set.empty
 
-val pipeMoves: Map[Char, Set[(Int, Int)]] = Map(
-    '|' -> Set((-1, 0), (1, 0)),   // Vertical pipe: Up and Down
-    '-' -> Set((0, -1), (0, 1)),   // Horizontal pipe: Left and Right
-    'L' -> Set((-1, 0), (0, 1)),   // L-shaped pipe: Up and Right
-    'J' -> Set((-1, 0), (0, -1)),  // J-shaped pipe: Up and Left
-    '7' -> Set((1, 0), (0, -1)),   // 7-shaped pipe: Down and Left
-    'F' -> Set((1, 0), (0, 1))     // F-shaped pipe: Down and Right
-    // Note: 'S' and '.' will be handled separately in the DFS function
-)
+case class Point(x: Int, y: Int):
+    def +(other: Point): Point = Point(x + other.x, y + other.y)
+    def -(other: Point): Point = Point(x - other.x, y - other.y)
+
+val North = Point(0, -1)
+val South = Point(0, 1)
+val West = Point(-1, 0)
+val East = Point(1, 0)
 
 val path: os.Path = os.root / "Users" / "agadd1" / "Documents" / "Adam" / "GitHub" / "AOC-2023" / "inputs" / "day10" / "p1.txt"
 
-@main def Part1: Unit =
-    val input: String = os.read(path)
-    val grid: Array[Array[Char]] = input.linesIterator.map(_.toCharArray).toArray
+@main def part1() =
+    val input = os.read(path)
+    val (loop, _) = findLoopFixTiles(parseTiles(input))
+    println(loop.size / 2)
 
+@main def part2() =
+    val input = os.read(path)
+    val (loop, tiles) = findLoopFixTiles(parseTiles(input))
+    val loopByY = loop.groupBy(_.pos.y).map((y, tiles) => (y, tiles.toSeq.sortBy(_.pos.x)))
+    val loopSet = loop.toSet
 
-    // Find the position of 'S'
-    val (sX, sY) = findS(grid)
+    val cornerPairs = Map('F' -> '7', 'L' -> 'J')
+    val output = tiles.values.filter(!loopSet.contains(_)).count(t => {
+        val leftWalls = loopByY.get(t.pos.y).getOrElse(Seq.empty).filter(_.pos.x < t.pos.x)
+        val wallCount = leftWalls.foldLeft((0, '.')):
+            case ((count, prevCorner), wall) =>
+            wall.symbol match
+                case '|'                                         => (count + 1, prevCorner)
+                case c if cornerPairs.get(prevCorner) == Some(c) => (count - 1, c)
+                case c: ('L' | 'F')                              => (count + 1, c)
+                case c: ('7' | 'J')                              => (count, c)
+                case _                                           => (count, prevCorner)
+        wallCount._1 % 2 == 1
+    })
 
-    // Print original grid
-    println("Original Grid:")
-    // grid.foreach(row => println(row.mkString))
+    println(output)
 
-    // Initialize distances array with high values
-    val distances = Array.fill(grid.length, grid(0).length)(Int.MaxValue)
+def findLoopFixTiles(tiles: Map[Point, Tile]) =
+    val start = tiles.values.find(t => t.symbol == 'S').get
+    val neighbours = Seq(North, East, South, West)
+        .flatMap(d => tiles.get(start.pos + d))
+        .filter(_.neighbours.contains(start.pos))
+    val neighbourPoints = neighbours.map(_.pos).toSet
+    val fixedStart = "|-LJ7F".map(Tile(_, start.pos)).find(t => t.neighbours == neighbourPoints).get
+    val fixedTiles = tiles ++ Map(fixedStart.pos -> fixedStart)
+    val loop = mutable.ArrayBuffer[Tile](fixedStart)
+    var current = neighbours.head
+    while (current != fixedStart) do
+      val next = fixedTiles(current.neighbours.find(_ != loop.last.pos).get)
+      loop += current
+      current = next
 
-    println(s"Starting position: ($sX, $sY)")
-    println(s"Starting distance: ${distances}")
+    (loop.toSeq, fixedTiles)
 
-@main def Part2: Unit =
-    return
-
-// Function to find the position of 'S'
-def findS(grid: Array[Array[Char]]): (Int, Int) = {
-    var position = (-1, -1)
-    breakable {
-        for (i <- grid.indices; j <- grid(i).indices) {
-            if (grid(i)(j) == 'S')  {
-                position = (i, j)
-                break()
-            }
-        }
-    }
-    position // Return an invalid position if 'S' is not found
-}
-
+def parseTiles(input: String) =
+    input.linesIterator.zipWithIndex
+        .flatMap((l, y) => l.zipWithIndex.map((t, x) => (t, x, y)))
+        .map((t, x, y) => Point(x, y) -> Tile(t, Point(x, y)))
+        .toMap
 
